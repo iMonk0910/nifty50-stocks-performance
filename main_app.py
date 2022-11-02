@@ -3,9 +3,11 @@ import pandas as pd
 import numpy as np
 import yfinance as yf
 import datetime as dt
+import seaborn as sns
 from datetime import timedelta
 import matplotlib.pyplot as plt
 from heapq import nlargest
+import matplotlib.pyplot as plt
 
 # Title and Subheader
 
@@ -264,19 +266,37 @@ Nifty50 = nifty50def(startDate,endDate, total_investment,Investment_time_in_year
 
 
 # Group data together
-
+import altair as alt
 plot_data = [Equal_Alloc_Buy_Hold[3], Nifty50[3], performance_Strat[3]]
-if len(DateIndex) != len(plot_data[0]):
-    DateIndex = DateIndex[0:-2]
-plt.plot(DateIndex, plot_data[0])
-plt.plot(DateIndex, plot_data[1])
 
-plt.plot(DateIndex, plot_data[2])
-plt.xlabel("Date")
-plt.title("Equity_Perf.")
-plt.legend("Equal_Alloc_Buy_Hold","Nifty50", "Performance_Strat")
+df_plot = pd.DataFrame(plot_data)
+df_plot = pd.DataFrame()
+df_plot["Equal_Alloc_Buy_Hold"] = Equal_Alloc_Buy_Hold[3][1:]
+df_plot["Nifty50"] = Nifty50[3]
+df_plot["performance_Strat"] = performance_Strat[3][1:]
+df_plot.set_index = DateIndex.values
 
-st.pyplot(plt.plot(DateIndex, plot_data[0]),
-plt.plot(DateIndex, plot_data[1]),
-plt.plot(DateIndex, plot_data[2]))
+# Note that even in the OO-style, we use `.pyplot.figure` to create the Figure.
 
+# Note that even in the OO-style, we use `.pyplot.figure` to create the Figure.
+fig, ax = plt.subplots(figsize=(10, 8))
+ax.plot(df_plot["Equal_Alloc_Buy_Hold"], label='Equal_Alloc_Buy_Hold')  # Plot some data on the axes.
+ax.plot(df_plot["Nifty50"], label='Nifty50')  # Plot more data on the axes...
+ax.plot(df_plot["performance_Strat"], label='performance_Strat')  # ... and some more.
+ax.set_xlabel('Date')  # Add an x-label to the axes.
+ax.set_ylabel('')  # Add a y-label to the axes.
+ax.set_title("Simple Plot")  # Add a title to the axes.
+
+ax.set_xticks(["2020-10", "2021-01", "2021-04", "2021-10", "2022-07","2022-12"])
+st.pyplot(fig)
+
+df_performance = pd.DataFrame()
+df_performance["Index"] = ["Equal_Alloc_Buy_Hold", "Nifty50", "Performance_Strat"]
+df_performance["CAPR%"] = [Equal_Alloc_Buy_Hold[0], Nifty50[0], performance_Strat[0]]
+df_performance["Volatility"] = [Equal_Alloc_Buy_Hold[1], Nifty50[1], performance_Strat[1]]
+df_performance["Sharp%"] = [Equal_Alloc_Buy_Hold[2], Nifty50[2], performance_Strat[2]]
+df_performance.set_index("Index")
+
+st.dataframe(df_performance.style.set_properties({'color': "lightslategrey"}))
+
+st.write(performance_Strat[4])
