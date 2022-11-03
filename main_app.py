@@ -296,6 +296,6 @@ df_performance["Volatility%"] = [Equal_Alloc_Buy_Hold[1], Nifty50[1], performanc
 df_performance["Sharp%"] = [Equal_Alloc_Buy_Hold[2], Nifty50[2], performance_Strat[2]]
 df_performance.set_index("Index")
 
-st.dataframe(df_performance.style.set_properties({'color': "lightslategrey"}))
+st.dataframe(df_performance)
 
 st.write(performance_Strat[4])
