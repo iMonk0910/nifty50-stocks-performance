@@ -287,8 +287,6 @@ ax.set_ylabel('')  # Add a y-label to the axes.
 ax.set_title("Sample Plot")  # Add a title to the axes.
 ax.legend() # Add a legend.
 ax.set_xticklabels(["2020-10", "2021-01", "2021-04", "2021-07", "2021-10", "2022-01", "2022-04", "2022-07","2022-10"],rotation = 45)
-
-st.plot(fig)
 st.pyplot(fig)
 
 df_performance = pd.DataFrame()
