@@ -5,7 +5,6 @@ import yfinance as yf
 import datetime as dt
 import seaborn as sns
 from datetime import timedelta
-import matplotlib.pyplot as plt
 from heapq import nlargest
 import matplotlib.pyplot as plt
 
