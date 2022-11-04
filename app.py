@@ -3,8 +3,6 @@ import pandas as pd
 import numpy as np
 import yfinance as yf
 import datetime as dt
-import seaborn as sns
-from datetime import timedelta
 from heapq import nlargest
 import matplotlib.pyplot as plt
 
