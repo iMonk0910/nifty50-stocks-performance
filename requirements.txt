@@ -4,5 +4,4 @@ yfinance
 pandas
 numpy
 matplotlib
-heapq
-datetime
+
