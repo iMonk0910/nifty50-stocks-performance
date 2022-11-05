@@ -5,6 +5,7 @@ import yfinance as yf
 import datetime as dt
 from heapq import nlargest
 import matplotlib.pyplot as plt
+import matplotlib.dates as mdates
 
 # Title and Subheader
 
@@ -25,8 +26,6 @@ with st.sidebar:
 
     n_days_measure_perf  = st.number_input("Enter perforformance measure for sample strategy", value = 100)
 
-
-
     total_investment = st.number_input("Enter initial Equity amount", value = 1000000)
 
 
@@ -38,15 +37,13 @@ nifty50_shares = pd.read_csv("https://archives.nseindia.com/content/indices/ind_
 #startDate = dt.datetime(2020, 10, 1)
 #endDate = dt.datetime(2022, 11, 1)
 
-
-endDate = dt.date.today()
 stocks_name_list = []
 for i in range(len(nifty50_shares)):
   stock_name =  f'Stock {i+1} ({nifty50_shares.loc[i, "Company Name"]})'
   stocks_name_list.append(stock_name)
-
-GetShareInfo_index = yf.Ticker(nifty50_shares["Symbol"][0]+".NS")
-DateIndex = GetShareInfo_index.history(start=startDate, end=endDate).index
+#
+# GetShareInfo_index = yf.Ticker(nifty50_shares["Symbol"][0]+".NS")
+# DateIndex = GetShareInfo_index.history(start=startDate, end=endDate).index
 
 
 Investment_time_in_years = ((endDate - startDate).days)/365.2425
@@ -261,30 +258,37 @@ def nifty50def(startDate, endDate, total_investment, Investment_time_in_years):
 
 Nifty50 = nifty50def(startDate,endDate, total_investment,Investment_time_in_years)
 
+st.write("Sample Input:")
+st.write("Input Config", '  \n',"sim_start = '", str(startDate),"'  \n", "end_date = '", str(endDate),"'  \n","n_days_measure_perf = ", n_days_measure_perf, '  \n', "top_n_stocks = ", number_of_top_stockes, "  \n", "in_eq = ", total_investment)
+
+
+st.write("Sample Output:")
+column01, column02 = st.columns(2)
 # Group data together
-import altair as alt
+
 plot_data = [Equal_Alloc_Buy_Hold[3], Nifty50[3], performance_Strat[3]]
 
-df_plot = pd.DataFrame(plot_data)
 df_plot = pd.DataFrame()
 df_plot["Equal_Alloc_Buy_Hold"] = Equal_Alloc_Buy_Hold[3][1:]
 df_plot["Nifty50"] = Nifty50[3]
 df_plot["performance_Strat"] = performance_Strat[3][1:]
-df_plot.set_index = DateIndex.values
+df_plot.index = pd.date_range(start = startDate, periods =len(Nifty50[3]) , freq = "1D")
 
-# Note that even in the OO-style, we use `.pyplot.figure` to create the Figure.
+fig, ax = plt.subplots(figsize=(12, 8))
+ax.plot(df_plot)
+years = mdates.YearLocator()   # every year
+months = mdates.MonthLocator(3) # every month
+yearsFmt = mdates.DateFormatter('%Y-%m')
+ax.grid(True)
+#ax.xaxis.set_major_locator(years)
+ax.xaxis.set_major_formatter(yearsFmt)
+#ax.xaxis.set_minor_locator(months)
 
-# Note that even in the OO-style, we use `.pyplot.figure` to create the Figure.
-fig, ax = plt.subplots(figsize=(10, 8))
-ax.plot(df_plot["Equal_Alloc_Buy_Hold"], label='Equal_Alloc_Buy_Hold')  # Plot some data on the axes.
-ax.plot(df_plot["Nifty50"], label='Nifty50')  # Plot more data on the axes...
-ax.plot(df_plot["performance_Strat"], label='Performance_Strat')  # ... and some more.
-ax.set_xlabel('Date')  # Add an x-label to the axes.
-ax.set_ylabel('')  # Add a y-label to the axes.
-ax.set_title("Sample Plot")  # Add a title to the axes.
-ax.legend() # Add a legend.
-ax.set_xticklabels(["2020-10", "2021-01", "2021-04", "2021-07", "2021-10", "2022-01", "2022-04", "2022-07","2022-10"],rotation = 45)
-st.pyplot(fig)
+for label in ax.get_xticklabels(which='major'):
+    label.set(rotation=45, horizontalalignment='right')
+
+
+column02.pyplot(fig)
 
 df_performance = pd.DataFrame()
 df_performance["Index"] = ["Equal_Alloc_Buy_Hold", "Nifty50", "Performance_Strat"]
@@ -292,7 +296,20 @@ df_performance["CAPR%"] = [Equal_Alloc_Buy_Hold[0], Nifty50[0], performance_Stra
 df_performance["Volatility%"] = [Equal_Alloc_Buy_Hold[1], Nifty50[1], performance_Strat[1]]
 df_performance["Sharp%"] = [Equal_Alloc_Buy_Hold[2], Nifty50[2], performance_Strat[2]]
 df_performance.set_index("Index")
+df_performance.style.background_gradient(axis=None, cmap='RdYlBu')
 
-st.dataframe(df_performance)
+column01.dataframe(df_performance)
 
-st.write(performance_Strat[4])
+
+lst_elem = " "
+
+for i in performance_Strat[4]:
+    if performance_Strat[4][(len(performance_Strat[4])-1)] == i:
+      lst_elem += i
+    else:
+      lst_elem += i +", "
+
+lst_elem = "[" + lst_elem + "]"
+
+st.write("Top Stocks Selected:")
+st.write(lst_elem)
